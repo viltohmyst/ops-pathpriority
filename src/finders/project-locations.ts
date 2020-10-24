@@ -8,13 +8,16 @@ import fs from 'fs/promises';
 import { constants } from 'fs';
 import * as root from 'app-root-path';
 
+type appRootOptions = never;
 declare module './../path-priority-builder' {
   interface PathPriorityBuilder {
-    appRoot: GeneratePathMethod;
+    appRoot: GeneratePathMethod<appRootOptions>;
   }
 }
 
-export const appRootFn: FinderCallback = (fileName?: string) => {
+export const appRootFn: FinderCallback<appRootOptions> = (
+  fileName?: string,
+) => {
   if (!fileName) {
     return Promise.reject(
       new Error(

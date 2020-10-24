@@ -3,21 +3,23 @@ interface GeneratorCallbackResult {
   path: string;
 }
 
-export type FinderCallback = (
+export type FinderCallback<OptionType = never> = (
   fileName?: string,
-  options?: any,
+  options?: OptionType,
 ) => Promise<string>;
 
-export type GeneratePathMethod = (
+export type GeneratePathMethod<OptionType> = (
   fileName?: string,
-  options?: any,
+  options?: OptionType,
 ) => PathPriorityBuilder;
 
-export const pathMethodInjector = (fn: FinderCallback) => {
-  const newMethod: GeneratePathMethod = function (
+export const pathMethodInjector = <OptionType>(
+  fn: FinderCallback<OptionType>,
+) => {
+  const newMethod: GeneratePathMethod<OptionType> = function (
     this: PathPriorityBuilder,
     fileName?: string,
-    options?: string,
+    options?: OptionType,
   ) {
     const usedFileName = fileName || this.fileNameArg;
     const result: GeneratorCallbackResult = {

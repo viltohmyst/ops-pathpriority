@@ -9,16 +9,21 @@ import fs from 'fs/promises';
 import { constants } from 'fs';
 import { fdir } from 'fdir';
 
+type findInParentsOptions = never;
+interface findWithGlobOptions {
+  maxDepth?: number;
+  startPath?: string;
+}
 declare module './../path-priority-builder' {
   interface PathPriorityBuilder {
-    findWithGlob: GeneratePathMethod;
-    findInParents: GeneratePathMethod;
+    findWithGlob: GeneratePathMethod<findWithGlobOptions>;
+    findInParents: GeneratePathMethod<findInParentsOptions>;
   }
 }
 
-export const findWithGlobFn: FinderCallback = (
+export const findWithGlobFn: FinderCallback<findWithGlobOptions> = (
   fileName?: string,
-  options?: any,
+  options?: findWithGlobOptions,
 ) => {
   if (!fileName) {
     return Promise.reject(
@@ -58,7 +63,9 @@ export const findWithGlobFn: FinderCallback = (
   return promiseResult;
 };
 
-export const findInParentsFn: FinderCallback = (fileName?: string) => {
+export const findInParentsFn: FinderCallback<findInParentsOptions> = (
+  fileName?: string,
+) => {
   if (!fileName) {
     return Promise.reject(
       new Error(

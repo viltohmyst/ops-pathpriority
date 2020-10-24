@@ -1,5 +1,6 @@
 import { PathPriorityBuilder } from './path-priority-builder';
 import './finders/default-locations';
+import './finders/relative-locations';
 import mockFs from 'mock-fs';
 import envPaths from 'env-paths';
 import path from 'path';
@@ -88,6 +89,7 @@ describe('PathPriorityBuilder', () => {
         .defaultData(path.join('data', 'data.txt'))
         .defaultLog(path.join('log', 'log.txt'))
         .defaultConfig(path.join('config', 'config.txt'))
+        .findWithGlob('**/config.txt', { startPath: '/' })
         .generate();
       expect(result[0]).toContain('data.txt');
       expect(result[1]).toContain('config.txt');

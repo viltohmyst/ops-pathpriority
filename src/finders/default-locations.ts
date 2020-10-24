@@ -9,14 +9,20 @@ import fs from 'fs/promises';
 import { constants } from 'fs';
 import os from 'os';
 
+type defaultDataOptions = never;
+type defaultConfigOptions = never;
+type defaultCacheOptions = never;
+type defaultLogOptions = never;
+type defaultTempOptions = never;
+type defaultHomeOptions = never;
 declare module './../path-priority-builder' {
   interface PathPriorityBuilder {
-    defaultData: GeneratePathMethod;
-    defaultConfig: GeneratePathMethod;
-    defaultCache: GeneratePathMethod;
-    defaultLog: GeneratePathMethod;
-    defaultTemp: GeneratePathMethod;
-    defaultHome: GeneratePathMethod;
+    defaultData: GeneratePathMethod<defaultDataOptions>;
+    defaultConfig: GeneratePathMethod<defaultConfigOptions>;
+    defaultCache: GeneratePathMethod<defaultCacheOptions>;
+    defaultLog: GeneratePathMethod<defaultLogOptions>;
+    defaultTemp: GeneratePathMethod<defaultTempOptions>;
+    defaultHome: GeneratePathMethod<defaultHomeOptions>;
   }
 }
 
@@ -47,7 +53,9 @@ export const defaultCacheFn = defaultCallbackMaker('cache');
 export const defaultLogFn = defaultCallbackMaker('log');
 export const defaultTempFn = defaultCallbackMaker('temp');
 
-export const defaultHomeFn: FinderCallback = (fileName?: string) => {
+export const defaultHomeFn: FinderCallback<defaultHomeOptions> = (
+  fileName?: string,
+) => {
   if (!fileName) {
     return Promise.reject(
       new Error(

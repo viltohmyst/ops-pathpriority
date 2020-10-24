@@ -21,7 +21,7 @@ describe('finders', () => {
 
     it('should use startPath as directory to crawl', () => {
       mockFs(dirStructure);
-      const result = findWithGlobFn('./**/target.txt', { startPath: '/' });
+      const result = findWithGlobFn('**/target.txt', { startPath: '/' });
       return expect(result).resolves.toContain('/root/first/target.txt');
     });
 
@@ -58,7 +58,7 @@ describe('finders', () => {
       });
       expect(result).toContain('/root/this/is/a/deep/folder/deeptarget.txt');
       try {
-        await findWithGlobFn('./**/deeptarget.txt', '/');
+        await findWithGlobFn('./**/deeptarget.txt', { startPath: '/' });
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
       }
