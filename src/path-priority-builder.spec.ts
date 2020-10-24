@@ -1,0 +1,96 @@
+import { PathPriorityBuilder } from './path-priority-builder';
+import './finders/default-locations';
+import mockFs from 'mock-fs';
+import envPaths from 'env-paths';
+import path from 'path';
+
+describe('PathPriorityBuilder', () => {
+  describe('generate', () => {
+    afterEach(() => {
+      // Reset the mocked fs
+      mockFs.restore();
+    });
+
+    it('should use arguments from findPaths', async () => {
+      const dataPath = envPaths(`test${path.sep}test.txt`, { suffix: '' }).data;
+      const dirStructure: any = {};
+      dirStructure[dataPath] = {};
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      const result = await pb
+        .findPaths('test.txt', 'test')
+        .defaultData()
+        .generate();
+      expect(result[0]).toContain('test.txt');
+    });
+
+    it('should use arguments from pathFinder', async () => {
+      const dataPath = envPaths(`target${path.sep}target.txt`, { suffix: '' })
+        .data;
+      const dirStructure: any = {};
+      dirStructure[dataPath] = {};
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      const result = await pb
+        .findPaths()
+        .defaultData('target.txt', 'target')
+        .generate();
+      expect(result[0]).toContain('target.txt');
+    });
+
+    it('should prioritize using args from pathFinder', async () => {
+      const dataPath = envPaths(`target${path.sep}target.txt`, { suffix: '' })
+        .data;
+      const dirStructure: any = {};
+      dirStructure[dataPath] = {};
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      const result = await pb
+        .findPaths('test.txt', 'test')
+        .defaultData('target.txt', 'target')
+        .generate();
+      expect(result[0]).toContain('target.txt');
+    });
+
+    it('should find all targets in order', async () => {
+      const dataPath = envPaths(`data${path.sep}data.txt`, { suffix: '' }).data;
+      const configPath = envPaths(`config${path.sep}config.txt`, { suffix: '' })
+        .config;
+
+      const dirStructure = {
+        [dataPath]: 'dummy content',
+        [configPath]: 'dummy content',
+      };
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      const result = await pb
+        .findPaths('test.txt', 'test')
+        .defaultData('data.txt', 'data')
+        .defaultConfig('config.txt', 'config')
+        .generate();
+      expect(result[0]).toContain('data.txt');
+      expect(result[1]).toContain('config.txt');
+    });
+
+    it('should discard unfound targets', async () => {
+      const dataPath = envPaths(`data${path.sep}data.txt`, { suffix: '' }).data;
+      const configPath = envPaths(`config${path.sep}config.txt`, { suffix: '' })
+        .config;
+
+      const dirStructure = {
+        [dataPath]: 'dummy content',
+        [configPath]: 'dummy content',
+      };
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      const result = await pb
+        .findPaths('test.txt', 'test')
+        .defaultData('data.txt', 'data')
+        .defaultLog('log.txt', 'log')
+        .defaultConfig('config.txt', 'config')
+        .generate();
+      expect(result[0]).toContain('data.txt');
+      expect(result[1]).toContain('config.txt');
+    });
+  });
+});
