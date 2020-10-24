@@ -8,25 +8,23 @@ export type FinderCallback<OptionType = never> = (
   options?: OptionType,
 ) => Promise<string>;
 
-export type GeneratePathMethod<OptionType> = (
-  fileName?: string,
-  options?: OptionType,
+export type GeneratePathMethod<OptionType = never> = (
+  ...args: Parameters<FinderCallback<OptionType>>
 ) => PathPriorityBuilder;
 
 export const pathMethodInjector = <OptionType>(
   fn: FinderCallback<OptionType>,
-) => {
+): GeneratePathMethod<OptionType> => {
   const newMethod: GeneratePathMethod<OptionType> = function (
     this: PathPriorityBuilder,
-    fileName?: string,
-    options?: OptionType,
+    ...args: Parameters<FinderCallback<OptionType>>
   ) {
-    const usedFileName = fileName || this.fileNameArg;
+    const usedFileName = args[0] || this.fileNameArg;
     const result: GeneratorCallbackResult = {
       priority: this.priorityCount++,
       path: '',
     };
-    const promiseResult = fn(usedFileName, options).then((filePath) => {
+    const promiseResult = fn(usedFileName, args[1]).then((filePath) => {
       result.path = filePath;
       return result;
     });

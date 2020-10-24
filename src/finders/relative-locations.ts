@@ -9,7 +9,6 @@ import fs from 'fs/promises';
 import { constants } from 'fs';
 import { fdir } from 'fdir';
 
-type findInParentsOptions = never;
 interface findWithGlobOptions {
   maxDepth?: number;
   startPath?: string;
@@ -17,7 +16,7 @@ interface findWithGlobOptions {
 declare module './../path-priority-builder' {
   interface PathPriorityBuilder {
     findWithGlob: GeneratePathMethod<findWithGlobOptions>;
-    findInParents: GeneratePathMethod<findInParentsOptions>;
+    findInParents: GeneratePathMethod;
   }
 }
 
@@ -63,9 +62,7 @@ export const findWithGlobFn: FinderCallback<findWithGlobOptions> = (
   return promiseResult;
 };
 
-export const findInParentsFn: FinderCallback<findInParentsOptions> = (
-  fileName?: string,
-) => {
+export const findInParentsFn: FinderCallback = (fileName?: string) => {
   if (!fileName) {
     return Promise.reject(
       new Error(
