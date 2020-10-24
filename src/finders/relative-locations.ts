@@ -18,7 +18,6 @@ declare module './../path-priority-builder' {
 
 export const findWithGlobFn: FinderCallback = (
   fileName?: string,
-  folderName?: string,
   options?: any,
 ) => {
   if (!fileName) {
@@ -29,8 +28,12 @@ export const findWithGlobFn: FinderCallback = (
     );
   }
 
+  let folderPath = process.cwd();
+  if (options?.startPath !== undefined) {
+    folderPath = options?.startPath;
+  }
+
   const filePath = fileName;
-  const folderPath = folderName || process.cwd();
 
   const maxDepth = options?.maxDepth || 3;
   const findFiles = new fdir()
@@ -55,10 +58,7 @@ export const findWithGlobFn: FinderCallback = (
   return promiseResult;
 };
 
-export const findInParentsFn: FinderCallback = (
-  fileName?: string,
-  folderName?: string,
-) => {
+export const findInParentsFn: FinderCallback = (fileName?: string) => {
   if (!fileName) {
     return Promise.reject(
       new Error(
@@ -67,11 +67,7 @@ export const findInParentsFn: FinderCallback = (
     );
   }
 
-  const usedFolderName = folderName || '.';
-
-  const filePath = `${path.join(usedFolderName, fileName)}`;
-
-  const promiseResult = findUp(filePath, { cwd: process.cwd() })
+  const promiseResult = findUp(fileName, { cwd: process.cwd() })
     .then((foundPath) => {
       if (foundPath === undefined) {
         throw new Error('No file found in parents');

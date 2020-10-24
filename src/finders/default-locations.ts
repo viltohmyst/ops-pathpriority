@@ -21,17 +21,16 @@ declare module './../path-priority-builder' {
 }
 
 const defaultCallbackMaker = (pathToFind: keyof envPaths.Paths) => {
-  return (fileName?: string, folderName?: string) => {
-    if (!fileName || !folderName) {
+  return (fileName?: string) => {
+    if (!fileName) {
       return Promise.reject(
         new Error(
-          'To conform with XDGDefaults, both fileName and folderName must be specified in findPaths(fileName, folderName) or in this function',
+          'fileName must be specified in findPaths(fileName) or in this function',
         ),
       );
     }
 
-    const dir = `${folderName}${path.sep}${fileName}`;
-    const filePath = envPaths(dir, { suffix: '' })[pathToFind];
+    const filePath = envPaths(fileName, { suffix: '' })[pathToFind];
 
     const promiseResult = fs
       .access(filePath, constants.W_OK | constants.R_OK)
@@ -48,10 +47,7 @@ export const defaultCacheFn = defaultCallbackMaker('cache');
 export const defaultLogFn = defaultCallbackMaker('log');
 export const defaultTempFn = defaultCallbackMaker('temp');
 
-export const defaultHomeFn: FinderCallback = (
-  fileName?: string,
-  folderName?: string,
-) => {
+export const defaultHomeFn: FinderCallback = (fileName?: string) => {
   if (!fileName) {
     return Promise.reject(
       new Error(
@@ -60,9 +56,7 @@ export const defaultHomeFn: FinderCallback = (
     );
   }
 
-  const usedFolderName = folderName || '.';
-
-  const filePath = `${path.join(os.homedir(), usedFolderName, fileName)}`;
+  const filePath = `${path.join(os.homedir(), fileName)}`;
 
   const promiseResult = fs
     .access(filePath, constants.W_OK | constants.R_OK)

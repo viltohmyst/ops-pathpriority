@@ -14,21 +14,21 @@ describe('finders', () => {
       const dataPath = path.join(root.path, 'test', 'test.txt');
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = appRootFn('test.txt', 'test');
+      const result = appRootFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = path.join(root.path, 'test');
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = appRootFn('test.txt', 'test');
+      const result = appRootFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = path.join(root.path, 'test.txt');
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = appRootFn('test.txt', 'test');
+      const result = appRootFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should find file in root directory if folder not supplied', () => {

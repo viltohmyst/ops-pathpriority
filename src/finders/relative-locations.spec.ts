@@ -19,13 +19,13 @@ describe('finders', () => {
       mockFs.restore();
     });
 
-    it('should use folderName as directory to crawl', () => {
+    it('should use startPath as directory to crawl', () => {
       mockFs(dirStructure);
-      const result = findWithGlobFn('./**/target.txt', '/');
+      const result = findWithGlobFn('./**/target.txt', { startPath: '/' });
       return expect(result).resolves.toContain('/root/first/target.txt');
     });
 
-    it('should default to CWD as directory to crawl if no folderName given', async () => {
+    it('should default to CWD as directory to crawl if no startPath given', async () => {
       mockFs(dirStructure);
       const spy = jest.spyOn(process, 'cwd');
       spy.mockReturnValue('/root/cwd');
@@ -38,7 +38,7 @@ describe('finders', () => {
 
     it('should throw error if file not found', () => {
       mockFs(dirStructure);
-      const result = findWithGlobFn('./**/target.json', '/');
+      const result = findWithGlobFn('./**/target.json', { startPath: '/' });
       return expect(result).rejects.toThrowError();
     });
 
@@ -52,7 +52,8 @@ describe('finders', () => {
 
     it('should extend max depth if specified', async () => {
       mockFs(dirStructure);
-      const result = await findWithGlobFn('./**/deeptarget.txt', '/', {
+      const result = await findWithGlobFn('./**/deeptarget.txt', {
+        startPath: '/',
         maxDepth: 6,
       });
       expect(result).toContain('/root/this/is/a/deep/folder/deeptarget.txt');
@@ -77,9 +78,6 @@ describe('finders', () => {
 
       const result = await findInParentsFn('parenttarget.txt');
       expect(result).toContain('/root/this/parenttarget.txt');
-
-      const result2 = await findInParentsFn('parenttarget.txt', 'this');
-      expect(result2).toContain('/root/this/parenttarget.txt');
 
       spy.mockRestore();
     });

@@ -5,13 +5,11 @@ interface GeneratorCallbackResult {
 
 export type FinderCallback = (
   fileName?: string,
-  folderName?: string,
   options?: any,
 ) => Promise<string>;
 
 export type GeneratePathMethod = (
   fileName?: string,
-  folderName?: string,
   options?: any,
 ) => PathPriorityBuilder;
 
@@ -19,21 +17,17 @@ export const pathMethodInjector = (fn: FinderCallback) => {
   const newMethod: GeneratePathMethod = function (
     this: PathPriorityBuilder,
     fileName?: string,
-    folderName?: string,
     options?: string,
   ) {
     const usedFileName = fileName || this.fileNameArg;
-    const usedFolderName = folderName || this.folderNameArg;
     const result: GeneratorCallbackResult = {
       priority: this.priorityCount++,
       path: '',
     };
-    const promiseResult = fn(usedFileName, usedFolderName, options).then(
-      (filePath) => {
-        result.path = filePath;
-        return result;
-      },
-    );
+    const promiseResult = fn(usedFileName, options).then((filePath) => {
+      result.path = filePath;
+      return result;
+    });
     this.generatorFunctions.push(promiseResult);
     return this;
   };
@@ -44,11 +38,9 @@ export class PathPriorityBuilder {
   protected generatorFunctions: Array<Promise<GeneratorCallbackResult>> = [];
   protected priorityCount = 0;
   protected fileNameArg?: string;
-  protected folderNameArg?: string;
 
-  public findPaths(fileName?: string, folderName?: string): this {
+  public findPaths(fileName?: string): this {
     this.fileNameArg = fileName;
-    this.folderNameArg = folderName;
     return this;
   }
 

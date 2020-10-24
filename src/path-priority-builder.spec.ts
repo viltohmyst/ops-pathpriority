@@ -18,7 +18,7 @@ describe('PathPriorityBuilder', () => {
       mockFs(dirStructure);
       const pb = new PathPriorityBuilder();
       const result = await pb
-        .findPaths('test.txt', 'test')
+        .findPaths(path.join('test', 'test.txt'))
         .defaultData()
         .generate();
       expect(result[0]).toContain('test.txt');
@@ -33,7 +33,7 @@ describe('PathPriorityBuilder', () => {
       const pb = new PathPriorityBuilder();
       const result = await pb
         .findPaths()
-        .defaultData('target.txt', 'target')
+        .defaultData(path.join('target', 'target.txt'))
         .generate();
       expect(result[0]).toContain('target.txt');
     });
@@ -46,8 +46,8 @@ describe('PathPriorityBuilder', () => {
       mockFs(dirStructure);
       const pb = new PathPriorityBuilder();
       const result = await pb
-        .findPaths('test.txt', 'test')
-        .defaultData('target.txt', 'target')
+        .findPaths(path.join('test', 'test.txt'))
+        .defaultData(path.join('target', 'target.txt'))
         .generate();
       expect(result[0]).toContain('target.txt');
     });
@@ -64,9 +64,9 @@ describe('PathPriorityBuilder', () => {
       mockFs(dirStructure);
       const pb = new PathPriorityBuilder();
       const result = await pb
-        .findPaths('test.txt', 'test')
-        .defaultData('data.txt', 'data')
-        .defaultConfig('config.txt', 'config')
+        .findPaths(path.join('test', 'test.txt'))
+        .defaultData(path.join('data', 'data.txt'))
+        .defaultConfig(path.join('config', 'config.txt'))
         .generate();
       expect(result[0]).toContain('data.txt');
       expect(result[1]).toContain('config.txt');
@@ -84,10 +84,10 @@ describe('PathPriorityBuilder', () => {
       mockFs(dirStructure);
       const pb = new PathPriorityBuilder();
       const result = await pb
-        .findPaths('test.txt', 'test')
-        .defaultData('data.txt', 'data')
-        .defaultLog('log.txt', 'log')
-        .defaultConfig('config.txt', 'config')
+        .findPaths(path.join('test', 'test.txt'))
+        .defaultData(path.join('data', 'data.txt'))
+        .defaultLog(path.join('log', 'log.txt'))
+        .defaultConfig(path.join('config', 'config.txt'))
         .generate();
       expect(result[0]).toContain('data.txt');
       expect(result[1]).toContain('config.txt');

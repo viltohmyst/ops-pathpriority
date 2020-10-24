@@ -14,10 +14,7 @@ declare module './../path-priority-builder' {
   }
 }
 
-export const appRootFn: FinderCallback = (
-  fileName?: string,
-  folderName?: string,
-) => {
+export const appRootFn: FinderCallback = (fileName?: string) => {
   if (!fileName) {
     return Promise.reject(
       new Error(
@@ -26,9 +23,7 @@ export const appRootFn: FinderCallback = (
     );
   }
 
-  const usedFolderName = folderName || '.';
-
-  const filePath = path.join(root.path, usedFolderName, fileName);
+  const filePath = path.join(root.path, fileName);
 
   const promiseResult = fs
     .access(filePath, constants.W_OK | constants.R_OK)

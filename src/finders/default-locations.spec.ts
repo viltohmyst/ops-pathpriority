@@ -22,29 +22,24 @@ describe('finders', () => {
       const dataPath = envPaths(`test${path.sep}test.txt`, { suffix: '' }).data;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultDataFn('test.txt', 'test');
+      const result = defaultDataFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = envPaths('test', { suffix: '' }).data;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultDataFn('test.txt', 'test');
+      const result = defaultDataFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = envPaths('test.txt', { suffix: '' }).data;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultDataFn('test.txt', 'test');
+      const result = defaultDataFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if file and / or folder not supplied', async () => {
-      try {
-        await defaultDataFn('test.txt');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-      }
       try {
         await defaultDataFn();
       } catch (error) {
@@ -64,29 +59,24 @@ describe('finders', () => {
         .config;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultConfigFn('test.txt', 'test');
+      const result = defaultConfigFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = envPaths('test', { suffix: '' }).config;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultConfigFn('test.txt', 'test');
+      const result = defaultConfigFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = envPaths('test.txt', { suffix: '' }).config;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultConfigFn('test.txt', 'test');
+      const result = defaultConfigFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if file and / or folder not supplied', async () => {
-      try {
-        await defaultConfigFn('test.txt');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-      }
       try {
         await defaultConfigFn();
       } catch (error) {
@@ -106,29 +96,24 @@ describe('finders', () => {
         .cache;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultCacheFn('test.txt', 'test');
+      const result = defaultCacheFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = envPaths('test', { suffix: '' }).cache;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultCacheFn('test.txt', 'test');
+      const result = defaultCacheFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = envPaths('test.txt', { suffix: '' }).cache;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultCacheFn('test.txt', 'test');
+      const result = defaultCacheFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if file and / or folder not supplied', async () => {
-      try {
-        await defaultCacheFn('test.txt');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-      }
       try {
         await defaultCacheFn();
       } catch (error) {
@@ -147,29 +132,24 @@ describe('finders', () => {
       const dataPath = envPaths(`test${path.sep}test.txt`, { suffix: '' }).log;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultLogFn('test.txt', 'test');
+      const result = defaultLogFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = envPaths('test', { suffix: '' }).log;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultLogFn('test.txt', 'test');
+      const result = defaultLogFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = envPaths('test.txt', { suffix: '' }).log;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultLogFn('test.txt', 'test');
+      const result = defaultLogFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if file and / or folder not supplied', async () => {
-      try {
-        await defaultLogFn('test.txt');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-      }
       try {
         await defaultLogFn();
       } catch (error) {
@@ -188,29 +168,24 @@ describe('finders', () => {
       const dataPath = envPaths(`test${path.sep}test.txt`, { suffix: '' }).temp;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultTempFn('test.txt', 'test');
+      const result = defaultTempFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = envPaths('test', { suffix: '' }).temp;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultTempFn('test.txt', 'test');
+      const result = defaultTempFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = envPaths('test.txt', { suffix: '' }).temp;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultTempFn('test.txt', 'test');
+      const result = defaultTempFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if file and / or folder not supplied', async () => {
-      try {
-        await defaultTempFn('test.txt');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-      }
       try {
         await defaultTempFn();
       } catch (error) {
@@ -229,21 +204,21 @@ describe('finders', () => {
       const dataPath = `${path.join(os.homedir(), 'test', 'test.txt')}`;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultHomeFn('test.txt', 'test');
+      const result = defaultHomeFn('test/test.txt');
       return expect(result).resolves.toContain('test.txt');
     });
     it('should throw error if file not found', () => {
       const dataPath = `${path.join(os.homedir(), 'test')}`;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultHomeFn('test.txt', 'test');
+      const result = defaultHomeFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should throw error if folder not found', () => {
       const dataPath = `${path.join(os.homedir(), 'test.txt')}`;
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
-      const result = defaultHomeFn('test.txt', 'test');
+      const result = defaultHomeFn('test/test.txt');
       return expect(result).rejects.toThrowError();
     });
     it('should find file in home directory if folder not supplied', () => {
@@ -251,7 +226,7 @@ describe('finders', () => {
       const dirStructure: any = { [dataPath]: 'dummy content' };
       mockFs(dirStructure);
       const result = defaultHomeFn('.test.txt');
-      return expect(result).resolves.toContain('test.txt');
+      return expect(result).resolves.toContain('.test.txt');
     });
     it('should throw error if file and folder not supplied', async () => {
       try {
