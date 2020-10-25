@@ -32,11 +32,9 @@ const defaultCallbackMaker = (pathToFind: keyof envPaths.Paths) => {
 
     const filePath = envPaths(fileName, { suffix: '' })[pathToFind];
 
-    const promiseResult = fs
-      .access(filePath, constants.W_OK | constants.R_OK)
-      .then(() => {
-        return filePath;
-      });
+    const promiseResult = fs.access(filePath, constants.F_OK).then(() => {
+      return filePath;
+    });
 
     return promiseResult;
   };
@@ -58,11 +56,9 @@ export const defaultHomeFn: FinderCallback = (fileName?: string) => {
 
   const filePath = `${path.join(os.homedir(), fileName)}`;
 
-  const promiseResult = fs
-    .access(filePath, constants.W_OK | constants.R_OK)
-    .then(() => {
-      return filePath;
-    });
+  const promiseResult = fs.access(filePath, constants.F_OK).then(() => {
+    return filePath;
+  });
 
   return promiseResult;
 };

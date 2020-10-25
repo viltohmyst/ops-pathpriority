@@ -19,10 +19,20 @@ describe('finders', () => {
       mockFs.restore();
     });
 
-    it('should use startPath as directory to crawl', () => {
+    it('should use startPath as directory to crawl', async () => {
       mockFs(dirStructure);
-      const result = findWithGlobFn('**/target.txt', { startPath: '/' });
-      return expect(result).resolves.toContain('/root/first/target.txt');
+      const result = await findWithGlobFn('**/target.txt', { startPath: '/' });
+      expect(result).toContain('/root/first/target.txt');
+    });
+
+    it('should use findAll to return all results', async () => {
+      mockFs(dirStructure);
+      const result = await findWithGlobFn('**/target.txt', {
+        startPath: '/',
+        findAll: true,
+      });
+      expect(result.length).toEqual(6);
+      expect(result).toContain('/root/first/target.txt');
     });
 
     it('should default to CWD as directory to crawl if no startPath given', async () => {

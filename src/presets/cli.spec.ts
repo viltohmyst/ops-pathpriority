@@ -1,6 +1,5 @@
-import { PathPriorityBuilder } from './path-priority-builder';
-import './finders/default-locations';
-import './finders/relative-locations';
+import { PathPriorityBuilder } from './../path-priority-builder';
+import './cli';
 import mockFs from 'mock-fs';
 import envPaths from 'env-paths';
 import path from 'path';
@@ -76,18 +75,14 @@ describe('PathPriorityBuilder', () => {
       expect(result[1]).toContain('config.txt');
     });
 
-    it('should discard unfound targets and present results in order', async () => {
+    it('should discard unfound targets', async () => {
       const dataPath = envPaths(`data${path.sep}data.txt`, { suffix: '' }).data;
       const configPath = envPaths(`config${path.sep}config.txt`, { suffix: '' })
         .config;
-      const cachePath = envPaths(`cache${path.sep}cache.txt`, { suffix: '' })
-        .cache;
 
       const dirStructure = {
         [dataPath]: 'dummy content',
         [configPath]: 'dummy content',
-        [cachePath]: 'dummy content',
-        '/root/config.txt': 'dummy content',
       };
       mockFs(dirStructure);
       const pb = new PathPriorityBuilder();
@@ -96,19 +91,10 @@ describe('PathPriorityBuilder', () => {
         .defaultData(path.join('data', 'data.txt'))
         .defaultLog(path.join('log', 'log.txt'))
         .defaultConfig(path.join('config', 'config.txt'))
-        .findWithGlob('**/config.txt', {
-          startPath: '/',
-          maxDepth: 5,
-          findAll: true,
-        })
-        .defaultCache(path.join('cache', 'cache.txt'))
+        .findWithGlob('**/config.txt', { startPath: '/' })
         .generate();
-      expect(result.length).toEqual(5);
       expect(result[0]).toContain('data.txt');
       expect(result[1]).toContain('config.txt');
-      expect(result[2]).toContain('/root/config.txt');
-      expect(result[3]).toContain('.config/config/config.txt');
-      expect(result[4]).toContain('cache.txt');
     });
   });
 });

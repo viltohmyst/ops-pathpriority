@@ -4,7 +4,6 @@ import {
   FinderCallback,
 } from './../path-priority-builder';
 import findUp from 'find-up';
-import path from 'path';
 import fs from 'fs/promises';
 import { constants } from 'fs';
 import { fdir } from 'fdir';
@@ -12,6 +11,7 @@ import { fdir } from 'fdir';
 interface findWithGlobOptions {
   maxDepth?: number;
   startPath?: string;
+  findAll?: boolean;
 }
 declare module './../path-priority-builder' {
   interface PathPriorityBuilder {
@@ -40,6 +40,7 @@ export const findWithGlobFn: FinderCallback<findWithGlobOptions> = (
   const filePath = fileName;
 
   const maxDepth = options?.maxDepth || 3;
+  const findAll = options?.findAll || false;
   const findFiles = new fdir()
     .glob(filePath)
     .withFullPaths()
@@ -52,11 +53,11 @@ export const findWithGlobFn: FinderCallback<findWithGlobOptions> = (
     if (result.length === 0) {
       throw new Error('found no matches');
     }
-    return fs
-      .access((output as Array<string>)[0], constants.W_OK | constants.R_OK)
-      .then(() => {
-        return (output as Array<string>)[0];
-      });
+    if (findAll) {
+      return result;
+    } else {
+      return result[0];
+    }
   });
 
   return promiseResult;
@@ -79,7 +80,7 @@ export const findInParentsFn: FinderCallback = (fileName?: string) => {
       return foundPath;
     })
     .then((foundPath) => {
-      return fs.access(foundPath, constants.W_OK | constants.R_OK).then(() => {
+      return fs.access(foundPath, constants.F_OK).then(() => {
         return foundPath;
       });
     });

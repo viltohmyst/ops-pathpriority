@@ -1,12 +1,7 @@
-interface GeneratorCallbackResult {
-  priority: number;
-  path: string;
-}
-
 export type FinderCallback<OptionType = never> = (
   fileName?: string,
   options?: OptionType,
-) => Promise<string>;
+) => Promise<string | Array<string>>;
 
 export type GeneratePathMethod<OptionType = never> = (
   ...args: Parameters<FinderCallback<OptionType>>
@@ -20,14 +15,18 @@ export const pathMethodInjector = <OptionType>(
     ...args: Parameters<FinderCallback<OptionType>>
   ) {
     const usedFileName = args[0] || this.fileNameArg;
-    const result: GeneratorCallbackResult = {
-      priority: this.priorityCount++,
-      path: '',
-    };
+
     const promiseResult = fn(usedFileName, args[1]).then((filePath) => {
-      result.path = filePath;
-      return result;
+      if (typeof filePath === 'string') {
+        return filePath;
+      }
+
+      const arrayResult = filePath.map((path) => {
+        return path;
+      });
+      return arrayResult;
     });
+
     this.generatorFunctions.push(promiseResult);
     return this;
   };
@@ -35,8 +34,7 @@ export const pathMethodInjector = <OptionType>(
 };
 
 export class PathPriorityBuilder {
-  protected generatorFunctions: Array<Promise<GeneratorCallbackResult>> = [];
-  protected priorityCount = 0;
+  protected generatorFunctions: Array<Promise<string | Array<string>>> = [];
   protected fileNameArg?: string;
 
   public findPaths(fileName?: string): this {
@@ -47,18 +45,32 @@ export class PathPriorityBuilder {
   public async generate(): Promise<Array<string>> {
     // Resolve all promises
     const promiseResult = await Promise.allSettled(this.generatorFunctions);
-    const pathResult = promiseResult.map((element) => {
-      if (element.status === 'fulfilled') {
-        return element.value;
+
+    const pathResult = promiseResult.reduce(
+      (result: Array<string | string[]>, element) => {
+        if (element.status === 'fulfilled') {
+          result.push(element.value);
+        }
+        return result;
+      },
+      [],
+    );
+
+    let resultAsArray: Array<string> = [];
+    pathResult.forEach((element) => {
+      if (element) {
+        if (Array.isArray(element)) {
+          resultAsArray = resultAsArray.concat(element);
+        } else if (typeof element === 'string') {
+          resultAsArray.push(element);
+        }
+      } else {
+        throw new Error(
+          `found undefined element in generator result ${pathResult}`,
+        );
       }
     });
 
-    pathResult.sort((a, b) => {
-      return (a?.priority as number) - (b?.priority as number);
-    });
-
-    const finalResult = pathResult.map((element) => element?.path as string);
-
-    return finalResult;
+    return resultAsArray;
   }
 }

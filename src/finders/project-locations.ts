@@ -25,11 +25,9 @@ export const appRootFn: FinderCallback = (fileName?: string) => {
 
   const filePath = path.join(root.path, fileName);
 
-  const promiseResult = fs
-    .access(filePath, constants.W_OK | constants.R_OK)
-    .then(() => {
-      return filePath;
-    });
+  const promiseResult = fs.access(filePath, constants.F_OK).then(() => {
+    return filePath;
+  });
 
   return promiseResult;
 };
