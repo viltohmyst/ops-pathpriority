@@ -110,5 +110,90 @@ describe('PathPriorityBuilder', () => {
       expect(result[3]).toContain('.config/config/config.txt');
       expect(result[4]).toContain('cache.txt');
     });
+
+    it('should discard envConditions', async () => {
+      const dataPath = envPaths(`data${path.sep}data.txt`, { suffix: '' }).data;
+      const configPath = envPaths(`config${path.sep}config.txt`, { suffix: '' })
+        .config;
+      const cachePath = envPaths(`cache${path.sep}cache.txt`, { suffix: '' })
+        .cache;
+
+      const dirStructure = {
+        [dataPath]: 'dummy content',
+        [configPath]: 'dummy content',
+        [cachePath]: 'dummy content',
+        '/root/config.txt': 'dummy content',
+      };
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      const result = await pb
+        .findPaths(path.join('test', 'test.txt'))
+        .defaultData(path.join('data', 'data.txt'))
+        .defaultLog(path.join('log', 'log.txt'))
+        .defaultConfig(path.join('config', 'config.txt'))
+        .findWithGlob('**/config.txt', {
+          startPath: '/',
+          maxDepth: 5,
+          findAll: true,
+        })
+        .defaultCache(path.join('cache', 'cache.txt'))
+        .generate();
+      expect(result.length).toEqual(5);
+      expect(result[0]).toContain('data.txt');
+      expect(result[1]).toContain('config.txt');
+      expect(result[2]).toContain('/root/config.txt');
+      expect(result[3]).toContain('.config/config/config.txt');
+      expect(result[4]).toContain('cache.txt');
+    });
+
+    it('should discard print help arrays and can be generated multiple times', async () => {
+      const dataPath = envPaths(`data${path.sep}data.txt`, { suffix: '' }).data;
+      const configPath = envPaths(`config${path.sep}config.txt`, { suffix: '' })
+        .config;
+      const cachePath = envPaths(`cache${path.sep}cache.txt`, { suffix: '' })
+        .cache;
+
+      const dirStructure = {
+        [dataPath]: 'dummy content',
+        [configPath]: 'dummy content',
+        [cachePath]: 'dummy content',
+        '/root/config.txt': 'dummy content',
+      };
+      mockFs(dirStructure);
+      const pb = new PathPriorityBuilder();
+      pb.findPaths(path.join('test', 'test.txt'))
+        .defaultData(path.join('data', 'data.txt'))
+        .defaultLog(path.join('log', 'log.txt'))
+        .defaultConfig(path.join('config', 'config.txt'))
+        .findWithGlob('**/config.txt', {
+          startPath: '/',
+          maxDepth: 5,
+          findAll: true,
+        })
+        .defaultCache(path.join('cache', 'cache.txt'));
+
+      const arrayStrings1 = pb.printArrayOfPriorities();
+      expect(arrayStrings1.length).toEqual(5);
+
+      const result = await pb.generate();
+      expect(result.length).toEqual(5);
+      expect(result[0]).toContain('data.txt');
+      expect(result[1]).toContain('config.txt');
+      expect(result[2]).toContain('/root/config.txt');
+      expect(result[3]).toContain('.config/config/config.txt');
+      expect(result[4]).toContain('cache.txt');
+
+      const arrayStrings2 = pb.printArrayOfPriorities();
+      expect(arrayStrings2.length).toEqual(5);
+
+      const dirStructure2 = {
+        '/root/config.txt': 'dummy content',
+      };
+      mockFs.restore();
+      mockFs(dirStructure2);
+      const result2 = await pb.generate();
+      expect(result2.length).toEqual(1);
+      expect(result2[0]).toContain('cache.txt');
+    });
   });
 });
