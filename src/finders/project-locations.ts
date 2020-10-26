@@ -32,4 +32,7 @@ export const appRootFn: FinderCallback = (fileName?: string) => {
   return promiseResult;
 };
 
-PathPriorityBuilder.prototype.appRoot = pathMethodInjector(appRootFn);
+PathPriorityBuilder.prototype.appRoot = pathMethodInjector(
+  appRootFn,
+  (fileName?: string) => `${path.join(root.path, fileName as string)}`,
+);

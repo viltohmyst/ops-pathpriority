@@ -7,6 +7,12 @@ declare module './../path-priority-builder' {
 }
 
 PathPriorityBuilder.prototype.useCliPreset = function (fileName: string) {
-  this.findPaths(fileName);
+  this.findPaths(fileName)
+    .ifEnv({ NODE_ENV: '?(development)?(debug)' })
+    .appRoot()
+    .ifEnv({ NODE_ENV: '?(development)?(debug)' })
+    .findInParents()
+    .defaultConfig()
+    .defaultHome();
   return this;
 };

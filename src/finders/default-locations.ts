@@ -63,11 +63,29 @@ export const defaultHomeFn: FinderCallback = (fileName?: string) => {
   return promiseResult;
 };
 
-PathPriorityBuilder.prototype.defaultData = pathMethodInjector(defaultDataFn);
+PathPriorityBuilder.prototype.defaultData = pathMethodInjector(
+  defaultDataFn,
+  (fileName?: string) => `${envPaths(fileName as string, { suffix: '' }).data}`,
+);
 PathPriorityBuilder.prototype.defaultConfig = pathMethodInjector(
   defaultConfigFn,
+  (fileName?: string) =>
+    `${envPaths(fileName as string, { suffix: '' }).config}`,
 );
-PathPriorityBuilder.prototype.defaultCache = pathMethodInjector(defaultCacheFn);
-PathPriorityBuilder.prototype.defaultLog = pathMethodInjector(defaultLogFn);
-PathPriorityBuilder.prototype.defaultTemp = pathMethodInjector(defaultTempFn);
-PathPriorityBuilder.prototype.defaultHome = pathMethodInjector(defaultHomeFn);
+PathPriorityBuilder.prototype.defaultCache = pathMethodInjector(
+  defaultCacheFn,
+  (fileName?: string) =>
+    `${envPaths(fileName as string, { suffix: '' }).cache}`,
+);
+PathPriorityBuilder.prototype.defaultLog = pathMethodInjector(
+  defaultLogFn,
+  (fileName?: string) => `${envPaths(fileName as string, { suffix: '' }).log}`,
+);
+PathPriorityBuilder.prototype.defaultTemp = pathMethodInjector(
+  defaultTempFn,
+  (fileName?: string) => `${envPaths(fileName as string, { suffix: '' }).temp}`,
+);
+PathPriorityBuilder.prototype.defaultHome = pathMethodInjector(
+  defaultHomeFn,
+  (fileName?: string) => `${path.join(os.homedir(), fileName as string)}`,
+);

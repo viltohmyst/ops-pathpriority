@@ -88,7 +88,11 @@ export const findInParentsFn: FinderCallback = (fileName?: string) => {
   return promiseResult;
 };
 
-PathPriorityBuilder.prototype.findWithGlob = pathMethodInjector(findWithGlobFn);
+PathPriorityBuilder.prototype.findWithGlob = pathMethodInjector(
+  findWithGlobFn,
+  (fileName?: string) => `child directories with glob pattern ${fileName}`,
+);
 PathPriorityBuilder.prototype.findInParents = pathMethodInjector(
   findInParentsFn,
+  (fileName?: string) => `parent directories with filename ${fileName}`,
 );

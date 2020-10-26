@@ -1,5 +1,5 @@
 import { PathPriorityBuilder } from './../path-priority-builder';
-import './cli';
+import './server';
 import * as root from 'app-root-path';
 import os from 'os';
 import mockFs from 'mock-fs';
@@ -18,7 +18,7 @@ describe('PathPriorityBuilder', () => {
     [`${rootPath}/package.json`]: 'dummy content',
   };
 
-  describe('useCliPreset', () => {
+  describe('useServerPreset', () => {
     afterEach(() => {
       // Reset the mocked fs
       mockFs.restore();
@@ -32,12 +32,12 @@ describe('PathPriorityBuilder', () => {
       process.env.NODE_ENV = 'development';
 
       const pb = new PathPriorityBuilder();
-      const result = await pb.useCliPreset('mycli/config.conf').generate();
+      const result = await pb.useServerPreset('mycli/config.conf').generate();
       expect(result.length).toEqual(4);
       expect(result[0]).toContain(`${rootPath}/mycli/config.conf`);
       expect(result[1]).toContain('/home/mycli/config.conf');
-      expect(result[2]).toContain(`${os.homedir()}/.config/mycli/config.conf`);
-      expect(result[3]).toContain(`${os.homedir()}/mycli/config.conf`);
+      expect(result[2]).toContain('/home/otheruser/child/mycli/config.conf');
+      expect(result[3]).toContain(`${os.homedir()}/.config/mycli/config.conf`);
 
       spy.mockRestore();
     });

@@ -1,3 +1,5 @@
+import { isMatch } from 'picomatch';
+
 type EnvConditionalValue = { [key: string]: string };
 
 type HelpDescriptionCallback = (filename?: string) => string;
@@ -21,23 +23,12 @@ export const pathMethodInjector = <OptionType>(
   ) {
     const usedFileName = args[0] || this.fileNameArg;
 
-    const promiseResult = fn(usedFileName, args[1]).then((filePath) => {
-      if (typeof filePath === 'string') {
-        return filePath;
-      }
-
-      const arrayResult = filePath.map((path) => {
-        return path;
-      });
-      return arrayResult;
-    });
-
-    this.generatorFunctions.push(promiseResult);
+    this.generatorFunctions.push(() => fn(usedFileName, args[1]));
 
     if (!description) {
-      this.helpDescriptions.push(`${fn.name} called with file name ${args[0]}`);
+      this.helpDescriptions.push(`path priority with file name ${args[0]}`);
     } else {
-      this.helpDescriptions.push(description(args[0]));
+      this.helpDescriptions.push(description(usedFileName));
     }
     return this;
   };
@@ -45,7 +36,9 @@ export const pathMethodInjector = <OptionType>(
 };
 
 export class PathPriorityBuilder {
-  protected generatorFunctions: Array<Promise<string | Array<string>>> = [];
+  protected generatorFunctions: Array<
+    () => Promise<string | Array<string>>
+  > = [];
   protected helpDescriptions: Array<string> = [];
   protected fileNameArg?: string;
   private envConditional: { [key: number]: EnvConditionalValue } = {};
@@ -55,23 +48,42 @@ export class PathPriorityBuilder {
     return this;
   }
 
-  public ifEnv(conditions: EnvConditionalValue) {
+  public ifEnv(conditions: EnvConditionalValue): PathPriorityBuilder {
     const envKeys = Object.keys(conditions);
     if (envKeys.length < 1) {
       throw new Error('at least one environment variable must be defined');
     }
 
     this.envConditional[this.generatorFunctions.length] = conditions;
+    this.helpDescriptions.push(
+      `if env vars satisfy ${JSON.stringify(conditions)} then find:`,
+    );
+    return this;
   }
 
-  public printArrayOfPriorities() {
+  public printPriorities() {
     return this.helpDescriptions;
   }
 
   public async generate(): Promise<Array<string>> {
     // Resolve all promises
+    const functionArrays: Array<Promise<string | Array<string>>> = [];
+    this.generatorFunctions.forEach((element) => {
+      functionArrays.push(
+        element().then((filePath) => {
+          if (typeof filePath === 'string') {
+            return filePath;
+          }
 
-    const promiseResult = await Promise.allSettled(this.generatorFunctions);
+          const arrayResult = filePath.map((path) => {
+            return path;
+          });
+          return arrayResult;
+        }),
+      );
+    });
+
+    const promiseResult = await Promise.allSettled(functionArrays);
 
     const envConditionResult = promiseResult.filter((element, index) => {
       const conditions = this.envConditional[index];
@@ -80,10 +92,10 @@ export class PathPriorityBuilder {
       }
 
       const conditionKeys = Object.keys(conditions);
-      const passEnvConditions = conditionKeys.every((result, element) => {
+      const passEnvConditions = conditionKeys.every((element) => {
         const envKey = element;
         const envValue = conditions[element];
-        return process.env[envKey] === envValue;
+        return isMatch(process.env[envKey] as string, envValue);
       });
 
       return passEnvConditions;
