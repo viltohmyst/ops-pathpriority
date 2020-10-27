@@ -24,7 +24,16 @@
     "type": "git",
     "url": "git+https://github.com/viltohmyst/ops-pathpriority.git"
   },
-  "keywords": [],
+  "keywords": [
+    "path",
+    "filepath",
+    "path-priority",
+    "pathpriority",
+    "search",
+    "config",
+    "configuration",
+    "priority"
+  ],
   "author": "",
   "license": "ISC",
   "publishConfig": {
