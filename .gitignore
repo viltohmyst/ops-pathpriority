@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # Compiled code
-lib/
+lib

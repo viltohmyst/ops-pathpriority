@@ -146,6 +146,7 @@ describe('PathPriorityBuilder', () => {
         .findPaths(path.join('test', 'test.txt'))
         .ifEnv({ PASS_COND: '?(ooglay)?(true)', OTHER_PASS_COND: 'tr?e' })
         .defaultData(path.join('data', 'data.txt'))
+        .ifEnv({ NON_EXISTENT: 'notExist' })
         .defaultLog(path.join('log', 'log.txt'))
         .ifEnv({ PASS_COND: 'false', OTHER_PASS_COND: 'false' })
         .defaultConfig(path.join('config', 'config.txt'))

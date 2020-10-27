@@ -1,13 +1,16 @@
 {
   "name": "ops-pathpriority",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/cjs/index.d.ts",
+  "files": [
+    "/lib"
+  ],
   "scripts": {
     "lint": "eslint 'src/**/*?(.spec).{js,ts,tsx}' --quiet --fix",
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build": "tsc -p tsconfig.prod.json && tsc -p tsconfig.prodcjs.json",
     "test": "jest",
     "ci:lintcheck": "eslint '*/**/*.{js,ts,tsx}' --quiet",
     "ci:tscheck": "tsc --noEmit",
@@ -31,10 +34,6 @@
     "url": "https://github.com/viltohmyst/ops-pathpriority/issues"
   },
   "homepage": "https://github.com/viltohmyst/ops-pathpriority#readme",
-  "files": [
-    "/lib",
-    "/bin"
-  ],
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "@types/mock-fs": "^4.13.0",

@@ -95,7 +95,8 @@ export class PathPriorityBuilder {
       const passEnvConditions = conditionKeys.every((element) => {
         const envKey = element;
         const envValue = conditions[element];
-        return isMatch(process.env[envKey] as string, envValue);
+        const matching = process.env[envKey] || '';
+        return isMatch(matching, envValue);
       });
 
       return passEnvConditions;
