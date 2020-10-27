@@ -1,7 +1,7 @@
 {
-  "name": "ops-pathpriority",
-  "version": "0.0.1",
-  "description": "",
+  "name": "path-priority",
+  "version": "0.3.0",
+  "description": "Never again shall you second guess how and where you get your (config) files. Define the priority of where to search for your files, and get an array of results from searching in those locations.",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/cjs/index.d.ts",
@@ -16,7 +16,7 @@
     "ci:tscheck": "tsc --noEmit",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
+    "preversion": "npm run lint && npm run test",
     "version": "npm run lint && git add -A src",
     "postversion": "git push && git push --tags"
   },
