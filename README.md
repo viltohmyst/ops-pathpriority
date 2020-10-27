@@ -18,7 +18,7 @@ Never again shall you second guess how and where you get your (config) files. De
 ## Install
 
 ```bash
-npm install ops-pathpriority # already includes typescript definitions
+npm install path-priority # already includes typescript definitions
 ```
 
 ## Usage
@@ -27,8 +27,8 @@ Easiest way is to use a priority preset :
 
 ```typescript
 // example-cli.ts
-import { PathPriorityBuilder } from 'ops-pathpriority';
-import 'ops-pathprioity/lib/cjs/presets/cli'; // import the preset
+import { PathPriorityBuilder } from 'path-priority';
+import 'path-prioity/lib/cjs/presets/cli'; // import the preset
 
 async function runPb() {
   try {
@@ -55,8 +55,8 @@ Define your own priority list :
 
 ```typescript
 // example-custom-priority.ts
-import { PathPriorityBuilder } from 'ops-pathpriority';
-import 'ops-pathpriority/lib/cjs/finders'; // import the finders
+import { PathPriorityBuilder } from 'path-priority';
+import 'path-priority/lib/cjs/finders'; // import the finders
 
 async function runPb() {
   try {
@@ -121,8 +121,8 @@ Instantly get good defaults for finding config files for a **CLI** or **Server**
 
 ```typescript
 // example-cli.ts
-import { PathPriorityBuilder } from 'ops-pathpriority';
-import 'ops-pathpriority/lib/cjs/presets/server';
+import { PathPriorityBuilder } from 'path-priority';
+import 'path-priority/lib/cjs/presets/server';
 
 async function runPb() {
   try {
@@ -146,8 +146,8 @@ runPb();
 The server preset is the same as defining a priority list of locations to search below :
 
 ```typescript
-import { PathPriorityBuilder } from 'ops-pathpriority';
-import 'ops-pathpriority/lib/cjs/finders';
+import { PathPriorityBuilder } from 'path-priority';
+import 'path-priority/lib/cjs/finders';
 import path from 'path';
 
 async function runPb() {
@@ -183,9 +183,9 @@ In case you missed it, an explanation on what the CLI preset does can be seen in
 
 This module comes with predefined location finders which range from basic (i.e. default OS home, config, data, temp directories) to advanced (i.e. crawl parent directories for a certain filename or child directories with glob patterns).
 
-You can choose to import all finders via `import 'ops-pathpriority/lib/cjs/finders'` or you can import certain finders only along with their (non-nodejs core) dependencies :
+You can choose to import all finders via `import 'path-priority/lib/cjs/finders'` or you can import certain finders only along with their (non-nodejs core) dependencies :
 
-- `import 'ops-pathpriority/lib/cjs/finders/default-locations'`
+- `import 'path-priority/lib/cjs/finders/default-locations'`
 
   These finders look for filePath inside your OS's default directories.
 
@@ -205,7 +205,7 @@ You can choose to import all finders via `import 'ops-pathpriority/lib/cjs/finde
 
     - [env-paths](https://github.com/sindresorhus/env-paths)
 
-- `import 'ops-pathpriority/lib/cjs/finders/project-locations'`
+- `import 'path-priority/lib/cjs/finders/project-locations'`
 
   This finder looks for filePath inside your project's root directory
 
@@ -215,7 +215,7 @@ You can choose to import all finders via `import 'ops-pathpriority/lib/cjs/finde
 
     - [app-root-path](https://github.com/inxilpro/node-app-root-path)
 
-- `import 'ops-pathpriority/lib/cjs/finders/relative-locations'`
+- `import 'path-priority/lib/cjs/finders/relative-locations'`
 
   - `findWithGlobfn(glob:string, options?:findWithGlobOptions)`
 
@@ -299,8 +299,8 @@ await pb
 Returns an array of strings describing the path priorities as well as the conditionals for the configured PathPriorityBuilder object. This function is synchronous and does not require `generate` to be called beforehand.
 
 ```typescript
-import { PathPriorityBuilder } from 'ops-pathpriority';
-import 'ops-pathpriority/lib/cjs/finders';
+import { PathPriorityBuilder } from 'path-priority';
+import 'path-priority/lib/cjs/finders';
 import path from 'path';
 
 async function runPb() {
@@ -357,11 +357,11 @@ To create your own preset, simply assign a new method to the `PathPriorirtyBuild
 
 ```typescript
 // myPreset.ts
-import { PathPriorityBuilder } from 'ops-pathpriority/lib/cjs/path-priority-builder';
-import 'ops-pathpriority/lib/cjs/finders'; // import finders
+import { PathPriorityBuilder } from 'path-priority/lib/cjs/path-priority-builder';
+import 'path-priority/lib/cjs/finders'; // import finders
 import './myFinder'; // or import your own custom finders
 
-declare module 'ops-pathpriority/lib/cjs/path-priority-builder' {
+declare module 'path-priority/lib/cjs/path-priority-builder' {
   interface PathPriorityBuilder {
     myPreset: (fileName: string) => PathPriorityBuilder;
   }
@@ -380,7 +380,7 @@ PathPriorityBuilder.prototype.myPreset = function (fileName: string) {
 To use it, just import your preset
 
 ```typescript
-import { PathPriorityBuilder } from 'ops-pathpriority';
+import { PathPriorityBuilder } from 'path-priority';
 import './myPreset';
 
 async function runPb() {
@@ -419,7 +419,7 @@ import {
   PathPriorityBuilder,
   pathMethodInjector,
   FinderCallback,
-} from 'ops-pathpriority/lib/cjs/path-priority-builder';
+} from 'path-priority/lib/cjs/path-priority-builder';
 import fs from 'fs/promises';
 import { constants } from 'fs';
 import path from 'path';
@@ -431,7 +431,7 @@ import path from 'path';
 //   findAll?: boolean;
 // }
 
-declare module 'ops-pathpriority/lib/cjs/path-priority-builder' {
+declare module 'path-priority/lib/cjs/path-priority-builder' {
   interface PathPriorityBuilder {
     myFinder: GeneratePathMethod; // if using options then use "myFinder: GeneratePathMethod<MyOptions>"
   }
@@ -466,7 +466,7 @@ PathPriorityBuilder.prototype.myFinder = pathMethodInjector(
 Import your finder to use it.
 
 ```typescript
-import { PathPriorityBuilder } from 'ops-pathpriority';
+import { PathPriorityBuilder } from 'path-priority';
 import './my-finder';
 
 async function runPb() {
