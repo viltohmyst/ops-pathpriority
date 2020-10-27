@@ -7,6 +7,7 @@ import findUp from 'find-up';
 import fs from 'fs/promises';
 import { constants } from 'fs';
 import { fdir } from 'fdir';
+import path from 'path';
 
 interface findWithGlobOptions {
   maxDepth?: number;
@@ -72,7 +73,10 @@ export const findInParentsFn: FinderCallback = (fileName?: string) => {
     );
   }
 
-  const promiseResult = findUp(fileName, { cwd: process.cwd() })
+  const parentDirStart = path.join(process.cwd(), '../');
+  const promiseResult = findUp(fileName, {
+    cwd: parentDirStart,
+  })
     .then((foundPath) => {
       if (foundPath === undefined) {
         throw new Error('No file found in parents');
