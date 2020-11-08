@@ -206,7 +206,7 @@ describe('finders', () => {
       spy.mockReturnValue('/root/this/is/a/deep/folder/');
 
       try {
-        findInParentsFn('parenttarget.json');
+        findInParentsSyncFn('parenttarget.json');
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
       }
