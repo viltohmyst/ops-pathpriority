@@ -1,54 +1,78 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isMatch } from 'picomatch';
 
 type EnvConditionalValue = { [key: string]: string };
 
 type HelpDescriptionCallback = (filename?: string) => string;
 
-export type FinderCallback<OptionType = never> = (
-  fileName?: string,
-  options?: OptionType,
-) => Promise<string | Array<string>>;
+type AsyncGeneratorReturnType = Array<() => Promise<string | Array<string>>>;
+type SyncGeneratorReturnType = Array<() => string | Array<string>>;
+
+export interface FinderCallback<OptionType = never> {
+  (fileName?: string, options?: OptionType): Promise<string | Array<string>>;
+}
+
+export interface FinderCallbackSync<OptionType = never> {
+  (fileName?: string, options?: OptionType): string | Array<string>;
+}
 
 export type GeneratePathMethod<OptionType = never> = (
   ...args: Parameters<FinderCallback<OptionType>>
 ) => PathPriorityBuilder;
 
-export const pathMethodInjector = <OptionType>(
-  fn: FinderCallback<OptionType>,
-  description?: HelpDescriptionCallback,
-): GeneratePathMethod<OptionType> => {
-  const newMethod: GeneratePathMethod<OptionType> = function (
-    this: PathPriorityBuilder,
-    ...args: Parameters<FinderCallback<OptionType>>
-  ) {
-    const usedFileName = args[0] || this.fileNameArg;
+export type GeneratePathMethodSync<OptionType = never> = (
+  ...args: Parameters<FinderCallbackSync<OptionType>>
+) => PathPriorityBuilderSync;
 
-    this.generatorFunctions.push(() => fn(usedFileName, args[1]));
+export const pathMethodInjector = <
+  T extends FinderCallback<OptionType> | FinderCallbackSync<OptionType>,
+  OptionType = never
+>(
+  fn: T,
+  description?: HelpDescriptionCallback,
+): T extends FinderCallback<OptionType>
+  ? GeneratePathMethod<OptionType>
+  : GeneratePathMethodSync<OptionType> => {
+  const newMethod = function (
+    this: T extends FinderCallback<OptionType>
+      ? PathPriorityBuilder
+      : PathPriorityBuilderSync,
+    ...args: T extends FinderCallback<OptionType>
+      ? Parameters<FinderCallback<OptionType>>
+      : Parameters<FinderCallbackSync<OptionType>>
+  ) {
+    const usedFileName = args[0] || (this as any).fileNameArg;
+
+    (this as any).generatorFunctions.push(
+      () => fn(usedFileName, args[1]) as any,
+    );
 
     if (!description) {
-      this.helpDescriptions.push(`path priority with file name ${args[0]}`);
+      (this as any).helpDescriptions.push(
+        `path priority with file name ${args[0]}`,
+      );
     } else {
-      this.helpDescriptions.push(description(usedFileName));
+      (this as any).helpDescriptions.push(description(usedFileName));
     }
     return this;
   };
-  return newMethod;
+  return newMethod as any;
 };
 
-export class PathPriorityBuilder {
-  protected generatorFunctions: Array<
-    () => Promise<string | Array<string>>
-  > = [];
+export class BasePriorityBuilder {
+  protected generatorFunctions:
+    | AsyncGeneratorReturnType
+    | SyncGeneratorReturnType = [];
   protected helpDescriptions: Array<string> = [];
   protected fileNameArg?: string;
-  private envConditional: { [key: number]: EnvConditionalValue } = {};
+  protected envConditional: { [key: number]: EnvConditionalValue } = {};
 
   public findPaths(fileName?: string): this {
     this.fileNameArg = fileName;
     return this;
   }
 
-  public ifEnv(conditions: EnvConditionalValue): PathPriorityBuilder {
+  public ifEnv(conditions: EnvConditionalValue): this {
     const envKeys = Object.keys(conditions);
     if (envKeys.length < 1) {
       throw new Error('at least one environment variable must be defined');
@@ -61,24 +85,78 @@ export class PathPriorityBuilder {
     return this;
   }
 
-  public printPriorities() {
+  public printPriorities(): Array<string> {
     return this.helpDescriptions;
   }
+}
 
+export class PathPriorityBuilderSync extends BasePriorityBuilder {
+  public generateSync(): Array<string> {
+    // Resolve all promises
+    const functionArrays: Array<string | Array<string> | undefined> = [];
+    const generatorFunction = this.generatorFunctions as Array<
+      () => string | Array<string>
+    >;
+    generatorFunction.forEach((element) => {
+      try {
+        const filePath = element();
+        functionArrays.push(filePath);
+      } catch (error) {
+        functionArrays.push(undefined);
+      }
+    });
+
+    const envConditionResult = functionArrays.filter((element, index) => {
+      if (!element) {
+        return false;
+      }
+
+      const conditions = this.envConditional[index];
+      if (!conditions) {
+        return true;
+      }
+
+      const conditionKeys = Object.keys(conditions);
+      const passEnvConditions = conditionKeys.every((element) => {
+        const envKey = element;
+        const envValue = conditions[element];
+        const matching = process.env[envKey] || '';
+        return isMatch(matching, envValue);
+      });
+
+      return passEnvConditions;
+    });
+
+    let resultAsArray: Array<string> = [];
+    envConditionResult.forEach((element) => {
+      if (element) {
+        if (Array.isArray(element)) {
+          resultAsArray = resultAsArray.concat(element);
+        } else if (typeof element === 'string') {
+          resultAsArray.push(element);
+        }
+      } else {
+        throw new Error(
+          `found undefined element in generator result ${envConditionResult}`,
+        );
+      }
+    });
+
+    return resultAsArray;
+  }
+}
+
+export class PathPriorityBuilder extends BasePriorityBuilder {
   public async generate(): Promise<Array<string>> {
     // Resolve all promises
     const functionArrays: Array<Promise<string | Array<string>>> = [];
-    this.generatorFunctions.forEach((element) => {
+    const generatorFunction = this.generatorFunctions as Array<
+      () => Promise<string | Array<string>>
+    >;
+    generatorFunction.forEach((element) => {
       functionArrays.push(
         element().then((filePath) => {
-          if (typeof filePath === 'string') {
-            return filePath;
-          }
-
-          const arrayResult = filePath.map((path) => {
-            return path;
-          });
-          return arrayResult;
+          return filePath;
         }),
       );
     });
