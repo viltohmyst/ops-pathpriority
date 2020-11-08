@@ -14,6 +14,7 @@ Never again shall you second guess how and where you get your (config) files. De
 - Print your configuration of priority paths, to use in a README or help command.
 - Extensible, if none of the predefined location finders or priority presets satisfy your needs, you can easily extend this module with your own custom solution.
 - Supports CommonJs (CJS) and EcmaScript Modules (ESM)
+- Has both synchronous and asynchronous versions
 
 ## Install
 
@@ -42,6 +43,32 @@ async function runPb() {
 }
 
 runPb();
+// Result :
+//[
+//  '/home/user/code/myproject/config/config.json',
+//  '/home/user/.config/config/config.json'
+//]
+```
+
+There is also a synchronous version, simply use `PathPriorityBuilderSync` and invoke `generateSync` instead of `generate` :
+
+```typescript
+// example-cli.ts
+import { PathPriorityBuilderSync } from 'path-priority';
+import 'path-prioity/lib/cjs/presets/cli'; // import the preset
+
+function runPbSync() {
+  try {
+    const pb = new PathPriorityBuilderSync();
+    const result = pb.useCliPreset('config/config.json').generateSync();
+
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+runPbSync();
 // Result :
 //[
 //  '/home/user/code/myproject/config/config.json',
