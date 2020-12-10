@@ -226,11 +226,11 @@ This module comes with predefined location finders which range from basic (i.e. 
 
 You can choose to import all finders via `import 'path-priority/lib/cjs/finders'` or you can import certain finders only along with their (non-nodejs core) dependencies :
 
-- `import 'path-priority/lib/cjs/finders/default-locations'`
+- `import 'path-priority/lib/cjs/finders/path-locations'`
 
-  These finders look for filePath inside your OS's default directories.
+  This finder simply looks for a file in a relative or absolute location.
 
-  - `defaultData(filePath: string) `
+  - `path(filePath: string) `
 
   - depencencies : None
 
@@ -345,7 +345,7 @@ await pb
 
 ### printPriorities()
 
-Returns an array of strings describing the path priorities as well as the conditionals for the configured PathPriorityBuilder object. This function is synchronous and does not require `generate` to be called beforehand.
+Returns an array of objects describing the path priorities as well as the conditionals for the configured PathPriorityBuilder object. This function is synchronous and does not require `generate` to be called beforehand.
 
 ```typescript
 import { PathPriorityBuilder } from 'path-priority';
@@ -376,16 +376,29 @@ async function runPb() {
 
 runPb();
 // Result :
-// /home/user/default.txt
-// /home/user/.config/mycli/config.json
-// if env vars satisfy {"IMPORTANT_URL":"http://important.internal"} then find:
-// parent directories with filename otherConfig.json
-// child directories with glob pattern *file.conf
+// The config file will be searched according to the following order :
+// 1. /home/viltohmyst/default.txt
+// 2. /home/viltohmyst/.config/mycli/config.json
+// 3. if {"IMPORTANT_URL":"http://important.internal"} equals true, then find parent directories with filename otherConfig.json
+// 4. child directories with glob pattern *file.conf
 ```
 
-**Question :** Why aren't you returning an actual string and instead an array of strings?
+The method returns a list of objects, each corresponding to a finder specified in the PathPriorityBuilder. The properties of the objects are :
+**description** : this is either an absolute path, or a verbose description of a relative path.
+**absolute** : this specifies whether the description is an absolute path
+**condition** : this specifies any environment variables that needs to be met before the path in the description is evaluated.
 
-**Answer :** So it is easier for you to format and present it to the user according to your needs.
+The method `printPriorities` is also useful for creating a file at a known location. For example, as long as the `absolute` property is true and the `condition` property is null for a certain path, then we can create the file beforehand :
+
+```typescript
+import fs from 'fs-extra'
+
+// with pb defined in previous examples
+const description = pb.printPriorities();
+
+// create the file
+await fs.ensureFile(description.find((path) => path.absolute && path.condition === null)?.description as string;
+```
 
 ### generate()
 

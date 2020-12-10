@@ -201,10 +201,12 @@ describe('PathPriorityBuilder', () => {
         absolute: true,
         condition: null,
         description: dataPath,
+        conditionPass: true,
       });
       expect(arrayPrint[3]).toMatchObject({
         absolute: false,
         condition: { NODE_ENV: '?(debug)?(development)' },
+        conditionPass: false,
       });
       const result = await pb.generate();
       expect(result.length).toEqual(3);
@@ -421,10 +423,12 @@ describe('PathPriorityBuilderSync', () => {
         absolute: true,
         condition: null,
         description: dataPath,
+        conditionPass: true,
       });
       expect(arrayPrint[3]).toMatchObject({
         absolute: false,
         condition: { NODE_ENV: '?(debug)?(development)' },
+        conditionPass: false,
       });
       const result = pb.generateSync();
       expect(result.length).toEqual(3);

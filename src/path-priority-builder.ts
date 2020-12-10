@@ -13,6 +13,7 @@ export interface PrintFormat {
   condition: EnvConditionalValue | null;
   description: string;
   absolute: boolean;
+  conditionPass: boolean;
 }
 
 export interface FinderCallback<OptionType = never> {
@@ -98,12 +99,30 @@ export class BasePriorityBuilder {
           description,
           absolute: path.isAbsolute(description) ?? false,
           condition: this.envConditional[index] ?? null,
+          conditionPass: this.envConditionPass(index),
         };
 
         return printFormat;
       },
     );
     return print;
+  }
+
+  protected envConditionPass(index: number): boolean {
+    const conditions = this.envConditional[index];
+    if (!conditions) {
+      return true;
+    }
+
+    const conditionKeys = Object.keys(conditions);
+    const passEnvConditions = conditionKeys.every((element) => {
+      const envKey = element;
+      const envValue = conditions[element];
+      const matching = process.env[envKey] || '';
+      return isMatch(matching, envValue);
+    });
+
+    return passEnvConditions;
   }
 }
 
@@ -128,20 +147,7 @@ export class PathPriorityBuilderSync extends BasePriorityBuilder {
         return false;
       }
 
-      const conditions = this.envConditional[index];
-      if (!conditions) {
-        return true;
-      }
-
-      const conditionKeys = Object.keys(conditions);
-      const passEnvConditions = conditionKeys.every((element) => {
-        const envKey = element;
-        const envValue = conditions[element];
-        const matching = process.env[envKey] || '';
-        return isMatch(matching, envValue);
-      });
-
-      return passEnvConditions;
+      return this.envConditionPass(index);
     });
 
     let resultAsArray: Array<string> = [];
@@ -181,20 +187,7 @@ export class PathPriorityBuilder extends BasePriorityBuilder {
     const promiseResult = await Promise.allSettled(functionArrays);
 
     const envConditionResult = promiseResult.filter((element, index) => {
-      const conditions = this.envConditional[index];
-      if (!conditions) {
-        return true;
-      }
-
-      const conditionKeys = Object.keys(conditions);
-      const passEnvConditions = conditionKeys.every((element) => {
-        const envKey = element;
-        const envValue = conditions[element];
-        const matching = process.env[envKey] || '';
-        return isMatch(matching, envValue);
-      });
-
-      return passEnvConditions;
+      return this.envConditionPass(index);
     });
 
     const pathResult = envConditionResult.reduce(
