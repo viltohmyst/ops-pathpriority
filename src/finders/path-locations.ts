@@ -49,10 +49,16 @@ export const pathSyncFn: FinderCallbackSync = (fileName?: string) => {
 
 PathPriorityBuilder.prototype.path = pathMethodInjector(
   pathFn,
-  (fileName?: string) => `${fileName as string}`,
+  (fileName?: string) =>
+    path.isAbsolute(fileName as string)
+      ? `${fileName as string}`
+      : path.resolve(fileName as string),
 );
 
 PathPriorityBuilderSync.prototype.path = pathMethodInjector(
   pathSyncFn,
-  (fileName?: string) => `${fileName as string}`,
+  (fileName?: string) =>
+    path.isAbsolute(fileName as string)
+      ? `${fileName as string}`
+      : path.resolve(fileName as string),
 );

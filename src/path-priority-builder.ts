@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isMatch } from 'picomatch';
+import path from 'path';
 
 type EnvConditionalValue = { [key: string]: string };
 
@@ -95,7 +96,7 @@ export class BasePriorityBuilder {
       (description, index): PrintFormat => {
         const printFormat: PrintFormat = {
           description,
-          absolute: description[0] === '/' ? true : false,
+          absolute: path.isAbsolute(description) ?? false,
           condition: this.envConditional[index] ?? null,
         };
 

@@ -127,12 +127,26 @@ const description = pb.printPriorities(); // this is a synchrounous operation
 
 console.log(description);
 //[
-//  'if env vars satisfy {"NODE_ENV":"?(development)?(debug)"} then find:',
-//  '/home/user/code/myporject/config/config.json',
-//  'if env vars satisfy {"NODE_ENV":"?(development)?(debug)"} then find:',
-//  'parent directories with filename config/config.json',
-//  '/home/user/.config/config/config.json',
-//  '/home/user/config/config.json'
+//  {
+//    description: '/home/viltohmyst/code/testing/tester/config/config.json',
+//    absolute: true,
+//    condition: { NODE_ENV: '?(development)?(debug)' }
+//  },
+//  {
+//    description: 'parent directories with filename config/config.json',
+//    absolute: false,
+//    condition: { NODE_ENV: '?(development)?(debug)' }
+//  },
+//  {
+//    description: '/home/viltohmyst/.config/config/config.json',
+//    absolute: true,
+//    condition: null
+//  },
+//  {
+//    description: '/home/viltohmyst/config/config.json',
+//    absolute: true,
+//    condition: null
+//  }
 //]
 ```
 
@@ -211,6 +225,14 @@ In case you missed it, an explanation on what the CLI preset does can be seen in
 This module comes with predefined location finders which range from basic (i.e. default OS home, config, data, temp directories) to advanced (i.e. crawl parent directories for a certain filename or child directories with glob patterns).
 
 You can choose to import all finders via `import 'path-priority/lib/cjs/finders'` or you can import certain finders only along with their (non-nodejs core) dependencies :
+
+- `import 'path-priority/lib/cjs/finders/default-locations'`
+
+  These finders look for filePath inside your OS's default directories.
+
+  - `defaultData(filePath: string) `
+
+  - depencencies : None
 
 - `import 'path-priority/lib/cjs/finders/default-locations'`
 
