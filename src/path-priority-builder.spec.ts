@@ -1,6 +1,7 @@
 import {
   PathPriorityBuilder,
   PathPriorityBuilderSync,
+  PrintFormat,
 } from './path-priority-builder';
 import './finders/default-locations';
 import './finders/relative-locations';
@@ -184,9 +185,9 @@ describe('PathPriorityBuilder', () => {
       const pb = new PathPriorityBuilder();
       pb.findPaths(path.join('test', 'test.txt'))
         .defaultData(path.join('data', 'data.txt'))
-        .ifEnv({ NODE_ENV: '?(debug)?(development)' })
         .defaultLog(path.join('log', 'log.txt'))
         .defaultConfig(path.join('config', 'config.txt'))
+        .ifEnv({ NODE_ENV: '?(debug)?(development)' })
         .findWithGlob('**/config.txt', {
           startPath: '/',
           maxDepth: 5,
@@ -194,28 +195,34 @@ describe('PathPriorityBuilder', () => {
         })
         .defaultCache(path.join('cache', 'cache.txt'));
 
-      const arrayStrings1 = pb.printPriorities();
-      expect(arrayStrings1.length).toEqual(6);
-
+      const arrayPrint = pb.printPriorities();
+      expect(arrayPrint.length).toEqual(5);
+      expect(arrayPrint[0]).toEqual({
+        absolute: true,
+        condition: null,
+        description: dataPath,
+      });
+      expect(arrayPrint[3]).toMatchObject({
+        absolute: false,
+        condition: { NODE_ENV: '?(debug)?(development)' },
+      });
       const result = await pb.generate();
-      expect(result.length).toEqual(5);
+      expect(result.length).toEqual(3);
       expect(result[0]).toContain('data.txt');
       expect(result[1]).toContain('config.txt');
-      expect(result[2]).toContain('/root/config.txt');
-      expect(result[3]).toContain('.config/config/config.txt');
-      expect(result[4]).toContain('cache.txt');
+      expect(result[2]).toContain('cache.txt');
 
       const arrayStrings2 = pb.printPriorities();
-      expect(arrayStrings2.length).toEqual(6);
+      expect(arrayStrings2.length).toEqual(5);
 
       const dirStructure2 = {
-        '/root/config.txt': 'dummy content',
+        [dataPath]: 'dummy content',
       };
       mockFs.restore();
       mockFs(dirStructure2);
       const result2 = await pb.generate();
       expect(result2.length).toEqual(1);
-      expect(result2[0]).toContain('config.txt');
+      expect(result2[0]).toContain('data.txt');
     });
   });
 });
@@ -398,9 +405,9 @@ describe('PathPriorityBuilderSync', () => {
       const pb = new PathPriorityBuilderSync();
       pb.findPaths(path.join('test', 'test.txt'))
         .defaultData(path.join('data', 'data.txt'))
-        .ifEnv({ NODE_ENV: '?(debug)?(development)' })
         .defaultLog(path.join('log', 'log.txt'))
         .defaultConfig(path.join('config', 'config.txt'))
+        .ifEnv({ NODE_ENV: '?(debug)?(development)' })
         .findWithGlob('**/config.txt', {
           startPath: '/',
           maxDepth: 5,
@@ -408,28 +415,34 @@ describe('PathPriorityBuilderSync', () => {
         })
         .defaultCache(path.join('cache', 'cache.txt'));
 
-      const arrayStrings1 = pb.printPriorities();
-      expect(arrayStrings1.length).toEqual(6);
-
+      const arrayPrint = pb.printPriorities();
+      expect(arrayPrint.length).toEqual(5);
+      expect(arrayPrint[0]).toEqual({
+        absolute: true,
+        condition: null,
+        description: dataPath,
+      });
+      expect(arrayPrint[3]).toMatchObject({
+        absolute: false,
+        condition: { NODE_ENV: '?(debug)?(development)' },
+      });
       const result = pb.generateSync();
-      expect(result.length).toEqual(5);
+      expect(result.length).toEqual(3);
       expect(result[0]).toContain('data.txt');
       expect(result[1]).toContain('config.txt');
-      expect(result[2]).toContain('/root/config.txt');
-      expect(result[3]).toContain('.config/config/config.txt');
-      expect(result[4]).toContain('cache.txt');
+      expect(result[2]).toContain('cache.txt');
 
       const arrayStrings2 = pb.printPriorities();
-      expect(arrayStrings2.length).toEqual(6);
+      expect(arrayStrings2.length).toEqual(5);
 
       const dirStructure2 = {
-        '/root/config.txt': 'dummy content',
+        [dataPath]: 'dummy content',
       };
       mockFs.restore();
       mockFs(dirStructure2);
       const result2 = pb.generateSync();
       expect(result2.length).toEqual(1);
-      expect(result2[0]).toContain('config.txt');
+      expect(result2[0]).toContain('data.txt');
     });
   });
 });

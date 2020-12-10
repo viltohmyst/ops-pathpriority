@@ -116,8 +116,7 @@ PathPriorityBuilder.prototype.defaultData = pathMethodInjector(
 );
 PathPriorityBuilderSync.prototype.defaultData = pathMethodInjector(
   defaultDataSyncFn,
-  (fileName?: string) =>
-    `${envPaths(fileName as string, { suffix: '' }).config}`,
+  (fileName?: string) => `${envPaths(fileName as string, { suffix: '' }).data}`,
 );
 
 PathPriorityBuilder.prototype.defaultConfig = pathMethodInjector(

@@ -55,7 +55,7 @@ There is also a synchronous version, simply use `PathPriorityBuilderSync` and in
 ```typescript
 // example-cli.ts
 import { PathPriorityBuilderSync } from 'path-priority';
-import 'path-prioity/lib/cjs/presets/cli'; // import the preset
+import 'path-priority/lib/cjs/presets/cli'; // import the preset
 
 function runPbSync() {
   try {

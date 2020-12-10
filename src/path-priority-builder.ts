@@ -8,6 +8,12 @@ type HelpDescriptionCallback = (filename?: string) => string;
 type AsyncGeneratorReturnType = Array<() => Promise<string | Array<string>>>;
 type SyncGeneratorReturnType = Array<() => string | Array<string>>;
 
+export interface PrintFormat {
+  condition: EnvConditionalValue | null;
+  description: string;
+  absolute: boolean;
+}
+
 export interface FinderCallback<OptionType = never> {
   (fileName?: string, options?: OptionType): Promise<string | Array<string>>;
 }
@@ -79,14 +85,24 @@ export class BasePriorityBuilder {
     }
 
     this.envConditional[this.generatorFunctions.length] = conditions;
-    this.helpDescriptions.push(
-      `if env vars satisfy ${JSON.stringify(conditions)} then find:`,
-    );
     return this;
   }
 
-  public printPriorities(): Array<string> {
-    return this.helpDescriptions;
+  public printPriorities(): Array<PrintFormat> {
+    if (this.helpDescriptions.length === 0) return [];
+
+    const print = this.helpDescriptions.map(
+      (description, index): PrintFormat => {
+        const printFormat: PrintFormat = {
+          description,
+          absolute: description[0] === '/' ? true : false,
+          condition: this.envConditional[index] ?? null,
+        };
+
+        return printFormat;
+      },
+    );
+    return print;
   }
 }
 
