@@ -1,6 +1,6 @@
 {
   "name": "path-priority",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Never again shall you second guess how and where you get your (config) files. Define the priority of where to search for your files, and get an array of results from searching in those locations.",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
