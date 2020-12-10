@@ -363,12 +363,24 @@ async function runPb() {
       .findWithGlob('*file.conf');
 
     const description = pb.printPriorities();
-    const stringDescription = description.reduce((accum, value) => {
-      accum += value + '\n';
+    const stringDescription = description.reduce((accum, value, index) => {
+      accum +=
+        (index + 1).toString() +
+        `. ${
+          value.condition
+            ? 'if ' +
+              JSON.stringify(value.condition) +
+              ' equals true, then find '
+            : ''
+        }` +
+        value.description +
+        '\n';
       return accum;
     }, '');
     // notice that you don't need to call generate before using printPriorities
-    console.log(stringDescription);
+    console.log(
+      'The config file will be searched according to the following order :',
+    );
   } catch (error) {
     console.log(error);
   }
@@ -387,8 +399,9 @@ The method returns a list of objects, each corresponding to a finder specified i
 **description** : this is either an absolute path, or a verbose description of a relative path.
 **absolute** : this specifies whether the description is an absolute path
 **condition** : this specifies any environment variables that needs to be met before the path in the description is evaluated.
+**conditionPass** : this returns true if all environment variable requirements are met.
 
-The method `printPriorities` is also useful for creating a file at a known location. For example, as long as the `absolute` property is true and the `condition` property is null for a certain path, then we can create the file beforehand :
+The method `printPriorities` is also useful for creating a file at a known location. For example, as long as the `absolute` and `conditionPass` property are true for a certain path, then we can create the file beforehand :
 
 ```typescript
 import fs from 'fs-extra'
@@ -397,7 +410,7 @@ import fs from 'fs-extra'
 const description = pb.printPriorities();
 
 // create the file
-await fs.ensureFile(description.find((path) => path.absolute && path.condition === null)?.description as string;
+await fs.ensureFile(description.find((path) => path.absolute && path.conditionPass)?.description as string;
 ```
 
 ### generate()
@@ -548,6 +561,13 @@ async function runPb() {
 }
 
 runPb();
-// description : [ 'looking in /home/user/.config/config/config.json' ]
+// description : [
+//  {
+//    description: 'looking in /home/user/.config/config/config.json',
+//    absolute: false,
+//    condition: null,
+//    conditionPass: true
+//  }
+// ]
 // result:  [ '/home/user/.config/config/config.json' ]
 ```
